@@ -1,6 +1,6 @@
 # Skupper local server
 
-[![main](https://github.com/ssorj/skupper-example-local-client/actions/workflows/main.yaml/badge.svg)](https://github.com/ssorj/skupper-example-local-client/actions/workflows/main.yaml)
+[![main](https://github.com/ssorj/skupper-example-local-server/actions/workflows/main.yaml/badge.svg)](https://github.com/ssorj/skupper-example-local-server/actions/workflows/main.yaml)
 
 #### Accept connections to a local process from a remote service
 
@@ -172,37 +172,28 @@ service/frontend exposed
 
 Run the backend service on your local machine.
 
-Use the `skupper gateway init` command to set up a gateway
-router on your local machine.  Use the `--type docker` option to
-run the router in a Docker container.
-
-XXX Use the `skupper gateway expose` command to make the backend
-service available on local port 8081.
+Use the `skupper gateway expose` command to set up a gateway
+router and bind the local backend process to the service
+network.
 
 _**Console for hello-world:**_
 
 ~~~ shell
 (cd backend && python python/main.py --host localhost --port 8080) &
-skupper gateway init --type docker
-skupper gateway expose backend localhost 8080
-kubectl get service/backend
+skupper gateway expose backend localhost 8080 --type docker
 ~~~
 
 _Sample output:_
 
 ~~~ console
 $ (cd backend && python python/main.py --host localhost --port 8080) &
-XXX
+INFO:     Started server process [1751062]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://localhost:8080 (Press CTRL+C to quit)
 
-$ skupper gateway init --type docker
-Skupper gateway: 'fancypants-jross'. Use 'skupper gateway status' to get more information.
-
-$ skupper gateway expose backend localhost 8080
+$ skupper gateway expose backend localhost 8080 --type docker
 2022/08/26 07:27:11 CREATE io.skupper.router.tcpConnector fancypants-jross-egress-backend:8080 map[address:backend:8080 host:localhost name:fancypants-jross-egress-backend:8080 port:8080 siteId:f1e916db-8786-4bad-81ce-f1d3531179f0]
-
-$ kubectl get service/backend
-NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-backend   ClusterIP   10.101.76.37   <none>        8080/TCP   10s
 ~~~
 
 ## Step 7: Test the application
@@ -281,8 +272,8 @@ _**Console for hello-world:**_
 kill $(ps -ef | grep 'python python/main\.py' | awk '{print $2}') 2> /dev/null
 skupper gateway delete
 skupper delete
-kubectl delete service/backend
-kubectl delete deployment/backend
+kubectl delete service/frontend
+kubectl delete deployment/frontend
 ~~~
 
 ## Next steps

@@ -1,6 +1,6 @@
 title: Skupper local server
 subtitle: Accept connections to a local process from a remote service
-github_actions_url: https://github.com/ssorj/skupper-example-local-client/actions/workflows/main.yaml
+github_actions_url: https://github.com/ssorj/skupper-example-local-server/actions/workflows/main.yaml
 overview: |
   This example is a multi-service HTTP application deployed across a
   Kubernetes cluster and a bare-metal host or VM.
@@ -94,12 +94,9 @@ steps:
     preamble: |
       Run the backend service on your local machine.
 
-      XXX Use the `skupper gateway init` command to set up a gateway
-      router on your local machine.  Use the `--type docker` option to
-      run the router in a Docker container.
-
-      XXX Use the `skupper gateway expose` command to make the backend
-      service available on local port 8081.
+      Use the `skupper gateway expose` command to set up a gateway
+      router and bind the local backend process to the service
+      network.
     commands:
       hello-world:
         - run: (cd backend && python python/main.py --host localhost --port 8080) &
@@ -111,11 +108,6 @@ steps:
         - run: skupper gateway expose backend localhost 8080 --type docker
           output: |
             2022/08/26 07:27:11 CREATE io.skupper.router.tcpConnector fancypants-jross-egress-backend:8080 map[address:backend:8080 host:localhost name:fancypants-jross-egress-backend:8080 port:8080 siteId:f1e916db-8786-4bad-81ce-f1d3531179f0]
-        - await: service/backend
-        - run: kubectl get service/backend
-          output: |
-            NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
-            backend   ClusterIP   10.101.76.37   <none>        8080/TCP   10s
   - standard: test_the_application
   - standard: accessing_the_web_console
   - standard: cleaning_up
